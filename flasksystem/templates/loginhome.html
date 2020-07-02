@@ -1,0 +1,19 @@
+{% extends "afterloginlayout.html" %}
+
+
+{% block content %}
+
+
+{%if  current_user.usertype=='Admin' %}
+<h1>Admin</h1>
+{% elif current_user.usertype=='ARPA'%}
+<h1>Agriculture Research and Product Assistant</h1>
+{% elif current_user.usertype=='ADO'%}
+<h1>Agrian Development Oficer</h1>
+{% elif current_user.usertype=='Farmer'%}
+<h1>Farmer</h1>
+{%else%}
+ <h1>Unauthorized</h1>
+{% endif %}
+
+{% endblock %}

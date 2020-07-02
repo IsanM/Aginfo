@@ -1,11 +1,15 @@
 <component name="ProjectDictionaryState">
   <dictionary name="ish">
     <words>
+      <w>agriofficer</w>
       <w>areaid</w>
       <w>crope</w>
       <w>cropid</w>
       <w>devisionoffice</w>
       <w>devisionoffices</w>
+      <w>devison</w>
+      <w>devisonoffice</w>
+      <w>devisonofficeid</w>
       <w>diseasethreatmant</w>
       <w>diseasethreatmants</w>
       <w>districtid</w>
@@ -20,8 +24,12 @@
       <w>fristname</w>
       <w>gorowing</w>
       <w>harvestid</w>
+      <w>isactive</w>
       <w>lastname</w>
+      <w>loginhome</w>
+      <w>myaccount</w>
       <w>officeid</w>
+      <w>oficer</w>
       <w>pdid</w>
       <w>pestdisease</w>
       <w>pestdiseases</w>

@@ -1,12 +1,17 @@
-
-from app import db
+from flasksystem import db, login_manager, app
 from datetime import datetime
-
+from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 # DATABASE MODELING
 """
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 """
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class District(db.Model):
@@ -30,7 +35,6 @@ class Area(db.Model):
     # add crop growing area
 
 
-
 class Devisionoffice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     officeName = db.Column(db.Text, nullable=False)
@@ -41,7 +45,7 @@ class Devisionoffice(db.Model):
     modified_timestamp = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     fristname = db.Column(db.Text, nullable=False)
     lastname = db.Column(db.Text, nullable=False)
@@ -57,7 +61,19 @@ class User(db.Model):
     devisionoffice_id = db.Column(db.Integer, db.ForeignKey('devisionoffice.id'))
     created_timestamp = db.Column(db.DateTime, default=datetime.now)
     modified_timestamp = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    # one to many relationship between district and user which mean one district live in many users
+    # one to many relationship between district and user which mean one district live in many
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 
 farm_crops = db.Table('farm_crops',
@@ -88,10 +104,8 @@ class Farm(db.Model):
     phone = db.Column(db.Integer, nullable=False, unique=False)
     address = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(255), nullable=True, unique=False)
-
     farmtask = db.relationship('Farmtask', backref='farm')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    farmtasks = db.relationship('Farmtask', backref='farm')
     fieldvisit = db.relationship('Fieldvisit', secondary=farm_fieldvisits, backref='farm')
     created_timestamp = db.Column(db.DateTime, default=datetime.now)
     modified_timestamp = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
@@ -164,7 +178,8 @@ class Harvest(db.Model):
 
 pestdisease_diseasethreatmants = db.Table('pestdisease_diseasethreatmants',
                                           db.Column('pestdisease_id', db.Integer, db.ForeignKey('pestdisease.id')),
-                                          db.Column('diseasethreatmant_id', db.Integer,  db.ForeignKey('diseasethreatmant.id'))
+                                          db.Column('diseasethreatmant_id', db.Integer,
+                                                    db.ForeignKey('diseasethreatmant.id'))
 
                                           )
 
@@ -198,5 +213,3 @@ class Diseasethreatmant(db.Model):
 # taskStartDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 # taskEndDate = db.Column(db.DateTime, nullable=False)
 # add relationships
-
-
