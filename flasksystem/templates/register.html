@@ -122,37 +122,58 @@
                                             {% endif %}
                                         </div>
                              </div>
-                             <div class="form-group row">
-                                    {{ form.district.label(class="col-md-4 col-form-label text-md-right") }}
+                            <div class="form-group row">
+                                 <label for="district" class="col-md-4 col-form-label text-md-right">District</label>
                                 <div class="col-md-6">
+                                        <select name="district" class="form-control" id="district">
 
-                                    {{ form.district(class="form-control")}}
+                                        {% for dis in district %}
+                                       <option value="{{dis.id}}">{{dis.districtName}}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+                            </div>
+                                                        <div class="form-group row">
+                                 <label for="area" class="col-md-4 col-form-label text-md-right">Area</label>
+
+                                <div class="col-md-6">
+                                        <select name="area" class="form-control" id="area">
+
+                                        {% for area in area %}
+                                       <option value="{{area.id}}" >{{area.areaName}}</option>
+                                        {% endfor %}
+                                    </select>
 
                                 </div>
 
                             </div>
+
                             <div class="form-group row">
-                                    {{ form.area.label(class="col-md-4 col-form-label text-md-right") }}
+                                 <label for="devisionoffice" class="col-md-4 col-form-label text-md-right">Devision office</label>
 
                                 <div class="col-md-6">
+                                        <select name="devisionoffice" class="form-control" id="devisionoffice">
 
-                                    {{ form.area(class="form-control")}}
+                                        {% for devisionoffices in devisionoffices %}
+                                       <option value="{{devisionoffices.id}}" >{{devisionoffices.officeName}}</option>
+                                        {% endfor %}
+                                    </select>
 
                                 </div>
-
-                            </div>
-
-                            <div class="form-group row">
-                                    {{ form.devisionoffice.label(class="col-md-4 col-form-label text-md-right") }}
-                                        <div class="col-md-6">
-                                            {{ form.devisionoffice(class="form-control")}}
-
-                                        </div>
 
                             </div>
 
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
+                                {{form.recaptcha}}
+
+                                        {% for error in form.recaptcha.errors %}
+
+                                        <span style="color:red">{{ error }}</span>
+
+                                        {% endfor %}
+
 
                                 {{form.submit(class="btn btn-primary")}}
 

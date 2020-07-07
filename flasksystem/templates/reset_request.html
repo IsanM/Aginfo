@@ -9,35 +9,28 @@
 
                     <div class="card-body">
                         <form method="POST">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                      {% for category, message in messages %}
+                                        <div class="alert alert-{{ category }}">
+                                          {{ message }}
+                                        </div>
+                                      {% endfor %}
+                                    {% endif %}
+                                 {% endwith %}
                              {{ form.hidden_tag() }}
-                           <div class="form-group row">
-                                        {{ form.password.label(class="col-md-4 col-form-label text-md-right") }}
+                            <div class="form-group row">
+                                        {{ form.email.label(class="col-md-4 col-form-label text-md-right") }}
                                         <div class="col-md-6">
-                                            {% if form.password.errors %}
-                                                {{ form.password(class="form-control form-control-lg is-invalid") }}
+                                            {% if form.email.errors %}
+                                                {{ form.email(class="form-control form-control-lg is-invalid") }}
                                                 <div class="invalid-feedback">
-                                                    {% for error in form.password.errors %}
+                                                    {% for error in form.email.errors %}
                                                         <span>{{ error }}</span>
                                                     {% endfor %}
                                         </div>
                                              {% else %}
-                                                    {{ form.password(class="form-control") }}
-                                            {% endif %}
-                                        </div>
-                             </div>
-
-                             <div class="form-group row">
-                                        {{ form.confirm_password.label(class="col-md-4 col-form-label text-md-right") }}
-                                        <div class="col-md-6">
-                                            {% if form.confirm_password.errors %}
-                                                {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
-                                                <div class="invalid-feedback">
-                                                    {% for error in form.confirm_password.errors %}
-                                                        <span>{{ error }}</span>
-                                                    {% endfor %}
-                                        </div>
-                                             {% else %}
-                                                    {{ form.confirm_password(class="form-control") }}
+                                                    {{ form.email(class="form-control") }}
                                             {% endif %}
                                         </div>
                              </div>

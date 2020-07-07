@@ -1,5 +1,5 @@
 import self as self
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 import email_validator
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, TextAreaField
@@ -18,10 +18,11 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     phone = IntegerField('Phone', validators=[DataRequired()])
     address = TextAreaField('Address', validators=[DataRequired(), Length(min=10)])
-    district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
-    area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
-    # usertype = SelectField('User Type', choices=[('Farmer','Farmer')], validators=[DataRequired()])
-    devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()], coerce=int)
+    #district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
+    #area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
+    # usertype = SelectField('User Type', choices=[('Farmer','Farmer')], validators=[DataRequired()]
+    #devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()], coerce=int)
+    recaptcha = RecaptchaField()
     submit = SubmitField('Register')
 
     def validate_email(self, email):
@@ -52,9 +53,9 @@ class UpdateAccountForm(FlaskForm):
     phone = IntegerField('Phone', validators=[DataRequired()])
     address = TextAreaField('Address', validators=[DataRequired(), Length(min=10)])
     # district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
-    area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
-    isactive = SelectField('Account Status', choices=[('1', 'Active'), ('0', 'Deactive')], validators=[DataRequired()])
-    devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()], coerce=int)
+    #area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
+    #active = SelectField('Account Status', choices=[('1', 'Active'), ('0', 'Deactive')], validators=[DataRequired()])
+    #devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()],coerce=int)
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update My Account')
 
@@ -76,7 +77,7 @@ class RequestResetForm(FlaskForm):
     submit = SubmitField('Request to password Reset')
 
     def validate_email(self, email):
-        if email.data != current_user.email:
+
             user = User.query.filter_by(email=email.data).first()
             if user is None:
                 raise ValidationError('There is no account with that email!,You must Register Frist')

@@ -8,8 +8,8 @@ from flasksystem.forms import RegistrationForm, LoginForm, UpdateAccountForm, Re
 from flasksystem.models import User, District, Area, Devisionoffice
 from flask_login import login_user, login_required, current_user, logout_user
 from flask_mail import Message
-
-
+from itsdangerous import URLSafeTimedSerializer,SignatureExpired
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 @app.route('/')
 @app.route('/home')
 def home():
@@ -69,6 +69,15 @@ def login():
 
     )
 '''
+def send_confirm_email(user):
+     token = user.get_email_confirm_token()
+     massage = Message('Email confirmation link', sender='ishanmadhawa440@gmail.com',recipients=[user.email])
+     massage.body = f'''To confirm your password and login, please visit fallowing link:
+{url_for('confirm_email',token=token, _external=True)} 
+If you want to access your Agri info account please use this confirmation link!     
+     
+     '''
+     mail.send(massage)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -78,22 +87,54 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('loginhome'))
+        user_confirm = user.confirmed
+        if(user_confirm==0):
+            send_confirm_email(user)
+            flash('You need to confirm your email!,Email Confirmation link has been send your Email Please check your Email!! .', 'info')
+            return redirect(url_for('email_confirmation_msg'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            if user and bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('loginhome'))
+            else:
+                flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@app.route('/confirm_email/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    user = User.verify_email_token(token)
+    if user is None:
+        flash('That is inavalid or expired token', 'warning')
+        redirect(url_for('login'))
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.now()
+        db.session.commit()
+        flash('Email confirm sucess fully please re enter login credantiels to login', 'success')
+        return redirect(url_for('login'))
+
+
+
+
+@app.route('/email_confirmation_msg')
+def email_confirmation_msg():
+
+    return render_template(
+        'email_confirmation_msg.html',
+        title='Email Confirmation Message',
+        year=datetime.now().year,
+    )
 
 
 @app.route('/loginhome')
 @login_required
 def loginhome():
+    image_file = url_for('static', filename='profilepics/' + current_user.profile)
     return render_template(
         'loginhome.html',
         title='User Home',
+        image_file=image_file,
         year=datetime.now().year,
 
     )
@@ -135,17 +176,18 @@ def ado():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    form.district.choices = [(d.id, d.districtName) for d in District.query.all()]
-    form.area.choices = [(area.id, area.areaName) for area in Area.query.filter_by(district_id='1').all()]
-    form.devisionoffice.choices = [(devisionoffice.id, devisionoffice.officeName) for devisionoffice in
-                                   Devisionoffice.query.filter_by(area_id='1').all()]
+
+    district = District.query.all()
+    area = Area.query.filter_by(district_id=1).all()
+    devisionoffices = Devisionoffice.query.filter_by(area_id=2).all()
+
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.confirm_password.data).decode('utf-8')
         user = User(fristname=form.fristname.data, lastname=form.lastname.data, email=form.email.data,
                     password=hashed_password, phone=form.phone.data, address=form.address.data,
                     profile='defaultprofile.jpg', usertype='Farmer', active=1,
-                    devisionoffice_id=form.devisionoffice.data, created_timestamp=datetime.now(),
-                    modified_timestamp=datetime.now())
+                    devisionoffice_id=request.form['devisionoffice'], created_timestamp=datetime.now(),
+                    modified_timestamp=datetime.now(), confirmed=False)
         db.session.add(user)
         db.session.commit()
         flash(f'Account created for {form.email.data}!', 'success')
@@ -154,6 +196,9 @@ def register():
     return render_template(
         'register.html',
         title='Register',
+        district=district,
+        area=area,
+        devisionoffices=devisionoffices,
         year=datetime.now().year, form=form
     )
 
@@ -212,41 +257,30 @@ def save_profile_picture(form_picture):
 def myaccount():
     form = UpdateAccountForm()
     ######################################################
-    user = User.query.filter_by(id=current_user.id).first()
-    cid = user.devisionoffice_id
+    devisionoffices = Devisionoffice.query.all()
+    ######################################################
+    devisionoffice = Devisionoffice.query.filter_by(id=current_user.devisionoffice_id).first()
+    devisionoffice_area_id = devisionoffice.area_id
+    print(current_user.devisionoffice_id)
+    print(devisionoffice_area_id)
+    #####################################################
+    area = Area.query.all()
+    area_select = Area.query.filter_by(id=devisionoffice_area_id).first()
+    area_districts_id = area_select.district_id
+    #area = Area.query.filter_by(district_id=area_districts_id).all()
 
-    ####################################################
-    # form.devisionoffice.choices = [(devisionoffice.id, devisionoffice.officeName) for devisionoffice in  Devisionoffice.query.all()]
-    devisionoffices = Devisionoffice.query.filter_by(id=cid).first()
-    devisionoffice_id = devisionoffices.id
-    devisionoffice_name = devisionoffices.officeName
-    devisionoffice_area_id = devisionoffices.area_id
-    form.devisionoffice.choices = [(devisionoffice_id, devisionoffice_name)]
-    #######################################################
-    # form.area.choices = [(area.id, area.areaName) for area in Area.query.all()]
-    area = Area.query.filter_by(id=devisionoffice_area_id).first()
-    area_default_id = area.id
-    area_default_name = area.areaName
-    area_districts_id = area.district_id
-    form.area.choices = [(area_default_id, area_default_name)]
-    ##########################################################
-    # form.district.choices = [(d.id, d.districtName) for d in District.query.all()]
-    # district = District.query.filter_by(id=area_districts_id).first()
-    # district_default_id = district.id
-    # district_default_name = district.districtName
-    # form.district.default = [(district_default_id)]
+    ########################################################
     select_district = District.query.filter_by(id=area_districts_id).first()
     district = District.query.all()
-
+    ###################################################
     if form.validate_on_submit():
-
         current_user.fristname = form.fristname.data
         current_user.lastname = form.lastname.data
         current_user.email = form.email.data
         current_user.phone = form.phone.data
         current_user.address = form.address.data
-        current_user.isactive = form.isactive.data
-        current_user.devisionoffice_id = form.devisionoffice.data
+        current_user.active = int(request.form['active'])
+        current_user.devisionoffice_id = request.form['devisionoffice']
         if form.picture.data:
             picture_file = save_profile_picture(form.picture.data)
             current_user.profile = picture_file
@@ -258,8 +292,7 @@ def myaccount():
         form.email.data = current_user.email
         form.phone.data = current_user.phone
         form.address.data = current_user.address
-        form.isactive.data = current_user.active
-        form.devisionoffice.data = current_user.devisionoffice
+
 
     image_file = url_for('static', filename='profilepics/' + current_user.profile)
     """Renders the about page."""
@@ -269,8 +302,12 @@ def myaccount():
         year=datetime.now().year,
         image_file=image_file,
         form=form,
-        district=district,
+        devisionoffices=devisionoffices,
         select_district=select_district,
+        district=district,
+        area_select=area_select,
+        area=area,
+        devisionoffice_area_id=devisionoffice_area_id,
         message='Your application description page.'
     )
 

@@ -25,13 +25,19 @@ login_manager.login_message_category='info'
 ############ MAIL Configuration ####################
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'ishanmadhawa44@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ishme@886082i'
+app.config['MAIL_USERNAME'] = 'ishanmadhawa440@gmail.com'
+app.config['MAIL_PASSWORD'] = 'bscsd1809'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeGCK0ZAAAAAGfjov9hTnafxfxR0Zgk-qdZ9r6o'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeGCK0ZAAAAAPxJwDZ-dIiNll1rXBpl_FAblWxe'
+
+
+
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost:52377/Aginfo'
 # db = SQLAlchemy(app)
 
 
 from flasksystem import routes
+

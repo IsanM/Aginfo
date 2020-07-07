@@ -1,12 +1,13 @@
 from flasksystem import db, login_manager, app
+
 from datetime import datetime
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 # DATABASE MODELING
-"""
-class Test(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-"""
+
+
+
+
 
 
 @login_manager.user_loader
@@ -50,6 +51,9 @@ class User(db.Model, UserMixin):
     fristname = db.Column(db.Text, nullable=False)
     lastname = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(255), nullable=False, unique=True)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
+
     password = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.Integer, nullable=False, unique=True)
     address = db.Column(db.Text, nullable=False)
@@ -74,6 +78,20 @@ class User(db.Model, UserMixin):
         except:
             return None
         return User.query.get(user_id)
+
+    def get_email_confirm_token(self, expier_time=1800):
+        es = Serializer(app.config['SECRET_KEY'], expier_time)
+        return es.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_email_token(token):
+        se = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = se.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
+
 
 
 farm_crops = db.Table('farm_crops',
