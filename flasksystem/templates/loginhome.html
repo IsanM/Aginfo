@@ -1,6 +1,6 @@
 {% extends "afterloginlayout.html" %}
 {% block content %}
-
+{%if  current_user.active==1 %}
      {%if  current_user.usertype=='Admin' %}
         <h1>Admin</h1>
      {% elif current_user.usertype=='ARPA'%}
@@ -34,12 +34,12 @@
         <div class="row text-center">
                 <div class="col-lg-3 col-md-6 mb-4">
                         <div class="view overlay">
-                            <a  class="nounderline" href="#">
+                            <a  class="nounderline" href="{{ url_for('farm_home') }}">
                             <div class="card h-100">
-                                <img class="card-img-top" src="#" alt="User Icon">
+                                <img class="card-img-top" src="\static\images\imgfarm.jpg" alt="User Icon">
                                     <div class="card-body">
-                                         <h4 class="card-title">Manage Users</h4>
-                                         <p class="card-text">Create Users and change user details</p>
+                                         <h4 class="card-title">Manage Farm</h4>
+                                         <p class="card-text">Use to add your Farm and manage your farm</p>
                                     </div>
 
                             </div>
@@ -101,9 +101,14 @@
                   </div>
 
      </div>
+    </div>
      {%else%}
         <h1>Unauthorized</h1>
      {% endif %}
+{%else%}
+        <h1>Your Account is Deactive</h1>
+{% endif %}
+
 
 
 {% endblock %}

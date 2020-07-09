@@ -1,0 +1,47 @@
+{% extends "afterloginlayout.html" %}
+{% block content %}
+{%if  current_user.active==1 %}
+    <link type="text/css" rel="stylesheet" href="../static/content/style.css" />
+
+		{%if  current_user.usertype=='Farmer' %}
+		        <div class="row justify-content-center">
+                        <div class="col-md-8">
+                           <div class="card">
+                               <div class="card-header">Confirm Email</div>
+                               <div class="card-body">
+                                   {% with messages = get_flashed_messages(with_categories=true) %}
+                                        {% if messages %}
+                                            {% for category, message in messages %}
+                                                <div class="alert alert-{{ category }}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                   {% endwith %}
+                                    <a class="btn btn-outline-primary" href="{{ url_for('login') }}" role="button">Go to Login</a>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+		{%else%}
+			<div id="notfound">
+				<div class="notfound">
+					<div class="notfound-404"></div>
+					<h4>ඔබට මෙම පිටුවට පිවිසිමට අවසර නොමැත</h4>
+					<h2>Oops! You can't Access this Page</h2>
+					<p>Sorry but the page you are looking for does not exist, have been removed. name changed or is temporarily unavailable</p>
+					<a href="{{url_for('loginhome')}}" class="btn btn-outline-info">ආපසු මුල් පිටුවට</a>
+				</div>
+			</div>
+		{% endif %}
+
+
+{%else%}
+        <h1>Your Account is Deactive</h1>
+{% endif %}
+
+
+
+{% endblock %}

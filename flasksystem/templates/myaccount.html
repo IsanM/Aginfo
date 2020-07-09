@@ -13,6 +13,7 @@
 
         }
 </style>
+{%if  current_user.active==1 %}
 <div class="container">
 
          <div class="row justify-content-center">
@@ -238,4 +239,7 @@
 
     }
 </script>
+{%else%}
+        <h1>Your Account is Deactive</h1>
+{% endif %}
 {% endblock %}

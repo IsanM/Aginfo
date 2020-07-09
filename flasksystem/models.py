@@ -53,7 +53,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=False, unique=True)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
-
     password = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.Integer, nullable=False, unique=True)
     address = db.Column(db.Text, nullable=False)

@@ -18,10 +18,10 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     phone = IntegerField('Phone', validators=[DataRequired()])
     address = TextAreaField('Address', validators=[DataRequired(), Length(min=10)])
-    #district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
-    #area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
+    # district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
+    # area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
     # usertype = SelectField('User Type', choices=[('Farmer','Farmer')], validators=[DataRequired()]
-    #devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()], coerce=int)
+    # devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()], coerce=int)
     recaptcha = RecaptchaField()
     submit = SubmitField('Register')
 
@@ -53,9 +53,9 @@ class UpdateAccountForm(FlaskForm):
     phone = IntegerField('Phone', validators=[DataRequired()])
     address = TextAreaField('Address', validators=[DataRequired(), Length(min=10)])
     # district = SelectField('District', choices=[], validators=[DataRequired()], coerce=int)
-    #area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
-    #active = SelectField('Account Status', choices=[('1', 'Active'), ('0', 'Deactive')], validators=[DataRequired()])
-    #devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()],coerce=int)
+    # area = SelectField('Area', choices=[], validators=[DataRequired()], coerce=int)
+    # active = SelectField('Account Status', choices=[('1', 'Active'), ('0', 'Deactive')], validators=[DataRequired()])
+    # devisionoffice = SelectField('Devison Office', choices=[], validators=[DataRequired()],coerce=int)
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update My Account')
 
@@ -77,13 +77,23 @@ class RequestResetForm(FlaskForm):
     submit = SubmitField('Request to password Reset')
 
     def validate_email(self, email):
-
-            user = User.query.filter_by(email=email.data).first()
-            if user is None:
-                raise ValidationError('There is no account with that email!,You must Register Frist')
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('There is no account with that email!,You must Register Frist')
 
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+
+class InsertNewFarmForm(FlaskForm):
+    farmname = StringField('Farm Name', validators=[DataRequired(), Length(min=4, max=50)])
+    latitude = IntegerField('Laitude', validators=[DataRequired()])
+    longitude = IntegerField('Longtude', validators=[DataRequired()])
+    phone = IntegerField('Phone', validators=[DataRequired()])
+    address = TextAreaField('Address', validators=[DataRequired(), Length(min=10)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
+
